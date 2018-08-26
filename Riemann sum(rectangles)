@@ -1,0 +1,26 @@
+#include <stdio.h>
+
+double function(double x);
+
+double RiemannSum_rect(double (*f)(double), double lower, double upper, double eps);
+
+int main() {
+  double l, u, S;
+  scanf("%lf %lf", &l, &u);
+  S = RiemannSum_rect(function, l, u, 1e-5);
+  printf("%lf", S);
+  return 0;
+}
+
+double function(double x){
+    return sin(x);
+}
+
+double RiemannSum_rect(double (*f)(double), double lower, double upper, double eps){
+    double S = 0, i = lower;
+    while (i < upper) {
+        S += eps * f(i+eps/2);
+        i += eps;
+    }
+    return S;
+}
