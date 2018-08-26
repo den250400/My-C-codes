@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define INF 3.4e38
+double function(double x);
+double randomNumber(double lower, double upper);
+double integrate_MonteCarlo(double (*f)(double), double lower, double upper, double eps, int N_points);
+
+int main() {
+  double l, u, S;
+  scanf("%lf %lf", &l, &u);
+  S = integrate_MonteCarlo(function, l, u, 1e-5, 1e5);
+  printf("%lf", S);
+  return 0;
+}
+
+double function(double x){
+    return sin(x);
+}
+
+double randomNumber(double lower, double upper){
+    double x = (double)rand() / (double)RAND_MAX;
+    x = x * (upper - lower); //Setting the required width of the distribution
+    x = x + lower; //Centering distribution at a new point
+    return x;
+}
+
+double integrate_MonteCarlo(double (*f)(double), double lower, double upper, double eps, int N_points){
+    double x, y, S0, S, j = lower, min = INF, max = -INF;
+    int N = 0;
+    //Finding min
+    while (j <= upper){
+        if (f(j) < min){
+            min = f(j);
+        }
+        j+=eps;
+    }
+    j = lower;
+    //Finding max
+    while (j <= upper){
+        if (f(j) > max){
+            max = f(j);
+        }
+        j+=eps;
+    }
+    srand(42); //initializing random number generator
+    S0 = (upper - lower) * fabs(max-min); //Calculating the surface area of bounding rectangle
+    for (int i = 0; i < N_points; i++){
+        x = randomNumber(lower, upper);
+        y = randomNumber(min, max);
+        if (y < f(x)){
+            N++; // The point is below the curve
+        }
+    }
+    S = S0 * (double)N / (double)N_points;
+    return S;
+}
